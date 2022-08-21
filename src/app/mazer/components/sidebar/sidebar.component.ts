@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { SidebarItem, State } from '../../reducers/sidebar.reducer';
 @Component({
   selector: 'app-sidebar',
   template: `
@@ -23,16 +25,16 @@ import { Component, OnInit } from '@angular/core';
         </div>
     </div>
     <div class="sidebar-menu">
-        <ul class="menu" *ngFor="let sidebarItem of sidebarItems" >
+        <ul class="menu">
             <li
-                class="sidebar-item">
+                class="sidebar-item font-weight-normal" *ngFor="let sidebarItem of sidebarItems$ | async" >
                 <a href="{{sidebarItem.url}}" class='sidebar-link'>
                     <i class="bi bi-{{ sidebarItem.icon }}"></i>
                     <span>{{sidebarItem.name}}</span>
                 </a>
-                <ng-container *ngIf="sidebarItem.items && sidebarItem.items.length">
+                <ng-container *ngIf="sidebarItem.submenu && sidebarItem.submenu.length">
                     <ul class="submenu">
-                        <ng-container *ngFor="let item of sidebarItem.items">
+                        <ng-container *ngFor="let item of sidebarItem.submenu">
                             <li class="submenu-item">
                                 <a href="{{ item.url }}">{{ item.name }}</a>
                             </li>
@@ -49,11 +51,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidebarComponent implements OnInit {
   
-  public sidebarItems: any[] = [];
+  public sidebarItems$: Observable<SidebarItem[]> = this.store.select<SidebarItem[]>((state: any) => {
+    return state.sidebar.sidebarItems;
+    });
 
-  constructor() { }
+  constructor(private store: Store<State>) { }
 
   ngOnInit(): void {
+    //
   }
 
 }
